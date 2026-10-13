@@ -1,0 +1,32 @@
+
+### 1. Health check
+GET http://localhost:5000/api/v1/health
+
+### 2. Create employee
+POST http://localhost:5000/api/v1/employees
+Content-Type: application/json
+
+{
+  "name": "Rahul Sharma",
+  "email": "rahul.sharma@example.com",
+  "department": "Engineering",
+  "salary": 45000
+}
+
+### 3. Get all employees
+GET http://localhost:5000/api/v1/employees
+
+
+### Get one employee
+GET http://localhost:5000/api/v1/employees/EMPLOYEE_ID
+
+### Update employee
+PATCH http://localhost:5000/api/v1/employees/EMPLOYEE_ID
+Content-Type: application/json
+
+{
+  "salary": 55000
+}
+
+### Delete employee
+DELETE http://localhost:5000/api/v1/employees/EMPLOYEE_ID
