@@ -4,8 +4,8 @@ import {
   getEmployeeById,
   updateEmployee,
   deleteEmployee,
+  getEmployeeDashboardSummary,
 } from "../services/employee.service.js";
-
 import {
   employeeSchema,
   employeeUpdateSchema,
@@ -112,6 +112,20 @@ export async function deleteEmployeeController(req, res, next) {
       success: true,
       message: "Employee deleted successfully",
       data: employee,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getEmployeeDashboardController(req, res, next) {
+  try {
+    const summary = await getEmployeeDashboardSummary();
+
+    return res.status(200).json({
+      success: true,
+      message: "Dashboard summary fetched successfully",
+      data: summary,
     });
   } catch (error) {
     next(error);

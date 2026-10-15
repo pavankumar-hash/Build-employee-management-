@@ -1,10 +1,12 @@
 import mongoose from "mongoose";
 import Employee from "../models/employee.model.js";
 
+// Create employee
 export async function createEmployee(employeeData) {
   return Employee.create(employeeData);
 }
 
+// Get all employees with search, filters, pagination and sorting
 export async function getAllEmployees(query = {}) {
   const page = Math.max(1, Number.parseInt(query.page, 10) || 1);
 
@@ -112,6 +114,7 @@ export async function getAllEmployees(query = {}) {
   };
 }
 
+// Get a single employee by ID
 export async function getEmployeeById(id) {
   if (!mongoose.isValidObjectId(id)) {
     const error = new Error("Invalid employee ID");
@@ -130,6 +133,7 @@ export async function getEmployeeById(id) {
   return employee;
 }
 
+// Update employee
 export async function updateEmployee(id, employeeData) {
   if (!mongoose.isValidObjectId(id)) {
     const error = new Error("Invalid employee ID");
@@ -151,6 +155,7 @@ export async function updateEmployee(id, employeeData) {
   return employee;
 }
 
+// Delete employee
 export async function deleteEmployee(id) {
   if (!mongoose.isValidObjectId(id)) {
     const error = new Error("Invalid employee ID");
@@ -167,4 +172,53 @@ export async function deleteEmployee(id) {
   }
 
   return employee;
+}
+
+// Dashboard summary
+export async function getEmployeeDashboardSummary() {
+  const [totalEmployees, departmentStats, salaryStats] = await Promise.all([
+    Employee.countDocuments(),
+
+    Employee.aggregate([
+      {
+        $group: {
+          _id: "$department",
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { count: -1, _id: 1 },
+      },
+    ]),
+
+    Employee.aggregate([
+      {
+        $group: {
+          _id: null,
+          averageSalary: { $avg: "$salary" },
+          minimumSalary: { $min: "$salary" },
+          maximumSalary: { $max: "$salary" },
+          totalSalary: { $sum: "$salary" },
+        },
+      },
+    ]),
+  ]);
+
+  const salary = salaryStats[0] ?? {};
+
+  return {
+    totalEmployees,
+
+    departmentStats: departmentStats.map((item) => ({
+      department: item._id ?? "Unassigned",
+      count: item.count,
+    })),
+
+    salaryStats: {
+      averageSalary: Math.round(salary.averageSalary ?? 0),
+      minimumSalary: salary.minimumSalary ?? 0,
+      maximumSalary: salary.maximumSalary ?? 0,
+      totalSalary: salary.totalSalary ?? 0,
+    },
+  };
 }

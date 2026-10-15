@@ -11,6 +11,7 @@ import {
   getEmployeeByIdController,
   updateEmployeeController,
   deleteEmployeeController,
+  getEmployeeDashboardController,
 } from "../controllers/employee.controller.js";
 
 const router = Router();
@@ -20,7 +21,12 @@ router
   .route("/")
   .get(authenticateToken, getAllEmployeesController)
   .post(authenticateToken, authorizeRoles("admin"), createEmployeeController);
-
+router.get(
+  "/dashboard/summary",
+  authenticateToken,
+  authorizeRoles("admin"),
+  getEmployeeDashboardController,
+);
 // GET, UPDATE and DELETE a single employee
 router
   .route("/:id")
